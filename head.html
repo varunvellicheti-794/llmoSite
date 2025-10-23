@@ -6,7 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
-<script nonce="${request.getAttribute('csp-nonce')}">
+<sly data-sly-set.nonce="${request.getAttribute('csp-nonce')}"></sly>
+
+<script nonce="${nonce}">
   (function() {
     const script = document.createElement('script');
     script.src = "https://main--rocket--perwezshaikh.aem.page/scripts/at.js";
@@ -14,7 +16,6 @@
     document.head.appendChild(script);
   })();
 </script>
-
 
 
 
