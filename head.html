@@ -7,7 +7,14 @@
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
 <!-- <script src="/scripts/at.js"></script> -->
-<script src="https://main--rocket--perwezshaikh.aem.page/scripts/at.js"
-        nonce="${pageContext.request.getAttribute('csp-nonce')}"></script>
+<script nonce="${pageContext.request.getAttribute('csp-nonce')}">
+  (function() {
+    const script = document.createElement('script');
+    script.src = "https://main--rocket--perwezshaikh.aem.page/scripts/at.js";
+    script.async = true;
+    document.head.appendChild(script);
+  })();
+</script>
+
 
 <link rel="stylesheet" href="/styles/styles.css"/>
