@@ -8,6 +8,9 @@
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
 <sly data-sly-set.nonce="${request.getAttribute('csp-nonce')}"></sly>
 
+<sly data-sly-use.request="${'request'}"></sly>
+<sly data-sly-set.nonce="${request.getAttribute('csp-nonce')}"></sly>
+
 <script nonce="${nonce}">
   (function() {
     const script = document.createElement('script');
