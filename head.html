@@ -7,7 +7,7 @@
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
 <!-- <script src="/scripts/at.js"></script> -->
-<script nonce="${pageContext.request.getAttribute('csp-nonce')}">
+<script nonce="${request.getAttribute('csp-nonce')}">
   (function() {
     const script = document.createElement('script');
     script.src = "https://main--rocket--perwezshaikh.aem.page/scripts/at.js";
@@ -15,6 +15,7 @@
     document.head.appendChild(script);
   })();
 </script>
+
 
 
 <link rel="stylesheet" href="/styles/styles.css"/>
