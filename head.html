@@ -11,14 +11,7 @@
 <sly data-sly-use.request="${'request'}"></sly>
 <sly data-sly-set.nonce="${request.getAttribute('csp-nonce')}"></sly>
 
-<script nonce="${nonce}">
-  (function() {
-    const script = document.createElement('script');
-    script.src = "https://main--rocket--perwezshaikh.aem.page/scripts/at.js";
-    script.async = true;
-    document.head.appendChild(script);
-  })();
-</script>
+
 
 <script 
   src="https://assets.adobedtm.com/d2309d5b8372/2568d842818b/launch-14d5f9999b80-development.min.js" 
