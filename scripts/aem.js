@@ -157,32 +157,6 @@ function setup() {
     console.warn('digitalData initialization failed', e);
   }
 
-
-/**
- * Push an event to the global digitalData.events array and optionally send an Alloy/Web SDK XDM payload.
- * This is a small, shared helper blocks can import to avoid duplicating logic.
- * @param {Object} evt event object to push into digitalData.events
- * @param {Object} [xdm] optional XDM payload to send via window.alloy when available
- */
-function pushDigitalEvent(evt = {}, xdm) {
-  try {
-    window.digitalData = window.digitalData || { events: [] };
-    window.digitalData.events.push(evt);
-    // eslint-disable-next-line no-console
-    console.debug('digitalData.push', evt);
-    if (xdm && window.alloy) {
-      try {
-        window.alloy('sendEvent', { xdm });
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn('Alloy sendEvent failed', err);
-      }
-    }
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn('pushDigitalEvent failed', err);
-  }
-}
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {
@@ -743,5 +717,4 @@ export {
   toClassName,
   waitForFirstImage,
   wrapTextNodes,
-  pushDigitalEvent,
 };
