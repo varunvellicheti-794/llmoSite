@@ -4,36 +4,9 @@
  * Decorate function for the identity-step block.
  * All DOM queries are scoped to the block to avoid global collisions.
  */
+import { pushDigitalEvent } from '../../scripts/aem.js';
 export default function decorate(block) {
-  // initialize standard Adobe-friendly data layer
-  window.digitalData = window.digitalData || { events: [], journey: {} };
-
-  /**
-   * Helper to push events to the global data layer and send via Alloy/Web SDK when available
-   * @param {Object} evt The event object to push
-   * @param {Object} [xdm] Optional XDM payload for Alloy
-   */
-  function pushDataEvent(evt, xdm) {
-    try {
-      window.digitalData = window.digitalData || { events: [] };
-      window.digitalData.events.push(evt);
-      // small console trace for debugging in dev
-      // eslint-disable-next-line no-console
-      console.log('AA Event Pushed:', evt);
-
-      if (xdm && window.alloy) {
-        try {
-          window.alloy('sendEvent', { xdm });
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.warn('Alloy sendEvent failed', err);
-        }
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('digitalData push failed', err);
-    }
-  }
+  // rely on shared pushDigitalEvent from scripts/aem.js
   const wrapper = document.createElement('div');
   wrapper.className = 'identity-block identity-block--root';
 
@@ -143,7 +116,7 @@ export default function decorate(block) {
       stepName,
       stepTimestamp: new Date().toISOString(),
     };
-    pushDataEvent(evt, {
+    pushDigitalEvent(evt, {
       eventType: 'identity.step',
       identityFlow: { stepName },
     });
@@ -181,7 +154,7 @@ export default function decorate(block) {
       selectedCard = card.dataset.card || '';
 
       // push card selection event
-      pushDataEvent({
+      pushDigitalEvent({
         event: 'card_selected',
         cardName: selectedCard,
         timestamp: new Date().toISOString(),
@@ -218,7 +191,7 @@ export default function decorate(block) {
         name: root.querySelector('#fullName')?.value || null,
         timestamp: new Date().toISOString(),
       };
-      pushDataEvent(payload, { eventType: 'identity.submit', selectedCard: { name: selectedCard } });
+  pushDigitalEvent(payload, { eventType: 'identity.submit', selectedCard: { name: selectedCard } });
       // allow normal form behavior (no preventDefault)
     });
   }
