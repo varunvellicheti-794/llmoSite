@@ -12,12 +12,10 @@
 <sly data-sly-set.nonce="${request.getAttribute('csp-nonce')}"></sly>
 
 
-
-<script 
-  src="https://assets.adobedtm.com/d2309d5b8372/2568d842818b/launch-14d5f9999b80-development.min.js" 
-  nonce="OsSQ2ntnFbOHzHnVqUTjuNCX">
+<script nonce="${request.getAttribute('csp-nonce')}"
+        src="https://assets.adobedtm.com/d2309d5b8372/2568d842818b/launch-14d5f9999b80-development.min.js"
+        async>
 </script>
-
 
 
 
