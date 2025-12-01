@@ -147,6 +147,16 @@ function setup() {
   window.hlx.codeBasePath = '';
   window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
 
+  // Initialize a standard Adobe-friendly global data layer for tracking events.
+  // This ensures `window.digitalData` exists early for all blocks and tag rules.
+  try {
+    window.digitalData = window.digitalData || { events: [], journey: {} };
+  } catch (e) {
+    // defensive: in very constrained CSP environments this could throw
+    // eslint-disable-next-line no-console
+    console.warn('digitalData initialization failed', e);
+  }
+
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {
