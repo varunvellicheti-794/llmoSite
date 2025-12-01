@@ -1,130 +1,66 @@
 export default function decorate(block) {
   const wrapper = document.createElement('div');
-  wrapper.className = 'identity-container';
+  wrapper.className = 'identity-wrapper';
 
   wrapper.innerHTML = `
-    <div class="tabs">
-      <div class="tab active" data-step="0">Choose Card</div>
-      <div class="tab" data-step="1">Confirm Details</div>
-      <div class="tab" data-step="2">Employment</div>
-      <div class="tab" data-step="3">Submit</div>
+    <div class="progress-bar">
+      <div class="step active">Identify Yourself</div>
+      <div class="step">Confirm Your Details</div>
+      <div class="step">Choose Card</div>
+      <div class="step">Submit & Receive</div>
     </div>
 
-    <div class="section active" id="step-0">
-      <h2>Choose Your Card</h2>
-      <div class="card-options">
-        <div class="card-box" data-card="MoneyBack">
-          <h3>MoneyBack+ Visa</h3>
-          <p>Everyday Spends • Recommended</p>
+    <h3 class="title">Hi, Now in just 3 easy steps , get the best offers for you</h3>
+
+    <div class="forms-container">
+      <div class="mobile-box">
+        <label>Enter your Mobile Number</label>
+        <div class="mobile-input">
+          <span>+91</span>
+          <input type="text" maxlength="10" placeholder="Enter mobile number">
+        </div>
+        <small>We will be sending you an OTP to this number have it handy</small>
+      </div>
+
+      <div class="validate-box">
+        <label>Validate using</label>
+        <div class="dob-row">
+          <label>Date of Birth</label>
+          <div class="dob-inputs">
+            <input type="text" maxlength="2" placeholder="DD">
+            <input type="text" maxlength="2" placeholder="MM">
+            <input type="text" maxlength="4" placeholder="YYYY">
+          </div>
         </div>
 
-        <div class="card-box" data-card="PixelPlay">
-          <h3>PIXEL Play</h3>
-          <p>Born Digital For The Born Digital</p>
-        </div>
+        <div class="divider">OR</div>
 
-        <div class="card-box" data-card="Swiggy">
-          <h3>Swiggy Card</h3>
-          <p>Savings Never Tasted So Good</p>
+        <div class="pan-row">
+          <label>PAN Number</label>
+          <div class="pan-inputs">
+            ${'<input type="text" maxlength="1">'.repeat(10)}
+          </div>
         </div>
       </div>
-      <button class="btn next-btn">Next</button>
     </div>
 
-    <div class="section" id="step-1">
-      <h2>Confirm Your Details</h2>
-      <label>Full Name</label>
-      <input id="fullName" placeholder="Enter full name" />
-
-      <label>Address</label>
-      <input id="address" placeholder="Enter address" />
-
-      <label>PIN Code</label>
-      <input id="pincode" placeholder="Enter PIN" />
-
-      <button class="btn-secondary prev-btn">Back</button>
-      <button class="btn next-btn">Next</button>
-    </div>
-
-    <div class="section" id="step-2">
-      <h2>Employment Information</h2>
-      <label>Employment Type</label>
-      <select id="empType">
-        <option>Full Time</option>
-        <option>Part Time</option>
-        <option>Self Employed</option>
-        <option>Student</option>
-      </select>
-
-      <label>Company Name</label>
-      <input id="company" placeholder="Enter Company Name" />
-
-      <button class="btn-secondary prev-btn">Back</button>
-      <button class="btn next-btn">Next</button>
-    </div>
-
-    <div class="section" id="step-3">
-      <h2>Review & Submit</h2>
-      <div class="review-box">
-        <p><b>Selected Card:</b> <span id="reviewCard"></span></p>
-        <p><b>Name:</b> <span id="reviewName"></span></p>
-        <p><b>Address:</b> <span id="reviewAddress"></span></p>
-        <p><b>PIN:</b> <span id="reviewPin"></span></p>
-        <p><b>Employment:</b> <span id="reviewEmp"></span></p>
-        <p><b>Company:</b> <span id="reviewCompany"></span></p>
-      </div>
-      <button class="btn-secondary prev-btn">Back</button>
-      <button class="btn">Submit Application</button>
+    <div class="consent-box">
+      <label>
+        <input type="checkbox">
+        I hereby consent to collection and processing of my data for availing this credit card and relevant services in the manner described in the notice <a href="#">here</a>.
+      </label>
     </div>
   `;
 
   block.replaceChildren(wrapper);
 
-  /* -------- JS Logic -------- */
-  let currentStep = 0;
-  let selectedCard = '';
-
-  const showStep = (step) => {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelector(`#step-${step}`).classList.add('active');
-
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab[data-step='${step}']`).classList.add('active');
-
-    currentStep = step;
-
-    if (step === 3) fillReview();
-  };
-
-  const fillReview = () => {
-    document.getElementById('reviewCard').innerText = selectedCard;
-    document.getElementById('reviewName').innerText = document.getElementById('fullName').value;
-    document.getElementById('reviewAddress').innerText = document.getElementById('address').value;
-    document.getElementById('reviewPin').innerText = document.getElementById('pincode').value;
-    document.getElementById('reviewEmp').innerText = document.getElementById('empType').value;
-    document.getElementById('reviewCompany').innerText = document.getElementById('company').value;
-  };
-
-  /* Card selection */
-  document.querySelectorAll('.card-box').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.card-box').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedCard = card.dataset.card;
-    });
-  });
-
-  /* Next Buttons */
-  document.querySelectorAll('.next-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (currentStep < 3) showStep(currentStep + 1);
-    });
-  });
-
-  /* Back Buttons */
-  document.querySelectorAll('.prev-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (currentStep > 0) showStep(currentStep - 1);
+  // --- Basic functionality: Auto move PAN inputs ---
+  const panInputs = wrapper.querySelectorAll('.pan-inputs input');
+  panInputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      if (inp.value && i < panInputs.length - 1) {
+        panInputs[i + 1].focus();
+      }
     });
   });
 }
