@@ -169,6 +169,106 @@ function setup() {
 }
 
 /**
+ * Read analytics configuration from meta tags or window.hlx.analytics
+ * Returns { reportSuite, datastreamId }
+ */
+function getAnalyticsConfig() {
+  const reportSuite = getMetadata('analytics:report-suite')
+    || (window.hlx && window.hlx.analytics && window.hlx.analytics.reportSuite)
+    || '';
+  const datastreamId = (window.hlx && window.hlx.analytics && window.hlx.analytics.datastreamId) || '';
+  return { reportSuite, datastreamId };
+}
+
+/**
+ * Push an event to the global digitalData.events array and optionally send an Alloy/Web SDK XDM payload.
+ * @param {Object} evt event object to push into digitalData.events
+ * @param {Object} [xdm] optional XDM payload to send via window.alloy when available
+ */
+function pushDigitalEvent(evt = {}, xdm) {
+  try {
+    window.digitalData = window.digitalData || { events: [] };
+    window.digitalData.events.push(evt);
+    // eslint-disable-next-line no-console
+    console.debug('digitalData.push', evt);
+    if (xdm && window.alloy) {
+      try {
+        window.alloy('sendEvent', { xdm });
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('Alloy sendEvent failed', err);
+      }
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('pushDigitalEvent failed', err);
+  }
+}
+
+/**
+ * Track a step in the identity flow. Produces a consistent XDM shape.
+ * @param {number} stepIndex
+ * @param {string} stepName
+ * @param {Object} [context] optional extra context (non-PII)
+ */
+function trackIdentityStep(stepIndex, stepName, context = {}) {
+  const evt = {
+    event: 'identity_step',
+    stepIndex,
+    stepName,
+    stepTimestamp: new Date().toISOString(),
+    ...context,
+  };
+  const xdm = {
+    eventType: 'identity.step',
+    identityFlow: { stepIndex, stepName },
+    page: { pageInfo: { pageURL: window.location.href, pageTitle: document.title } },
+    eventTimestamp: new Date().toISOString(),
+  };
+  pushDigitalEvent(evt, xdm);
+}
+
+/**
+ * Track card selection
+ * @param {string} cardName
+ * @param {Object} [context] optional extra context
+ */
+function trackCardSelected(cardName, context = {}) {
+  const evt = {
+    event: 'card_selected',
+    cardName,
+    timestamp: new Date().toISOString(),
+    ...context,
+  };
+  const xdm = {
+    eventType: 'card.selected',
+    product: { selectedCard: { name: cardName } },
+    page: { pageInfo: { pageURL: window.location.href } },
+    eventTimestamp: new Date().toISOString(),
+  };
+  pushDigitalEvent(evt, xdm);
+}
+
+/**
+ * Track final submit of the identity journey. Payload must avoid PII — include only allowable fields.
+ * @param {Object} payload sanitized payload (non-PII)
+ */
+function trackIdentitySubmit(payload = {}) {
+  const safe = {
+    event: 'identity_submit',
+    selectedCard: payload.selectedCard || null,
+    timestamp: new Date().toISOString(),
+  };
+  const xdm = {
+    eventType: 'identity.submit',
+    identityFlow: { selectedCard: { name: safe.selectedCard } },
+    page: { pageInfo: { pageURL: window.location.href } },
+    eventTimestamp: safe.timestamp,
+  };
+  pushDigitalEvent(safe, xdm);
+}
+
+/**
  * Auto initialization.
  */
 
@@ -713,6 +813,11 @@ export {
   readBlockConfig,
   sampleRUM,
   setup,
+  getAnalyticsConfig,
+  pushDigitalEvent,
+  trackIdentityStep,
+  trackCardSelected,
+  trackIdentitySubmit,
   toCamelCase,
   toClassName,
   waitForFirstImage,

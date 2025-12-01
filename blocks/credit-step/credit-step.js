@@ -4,36 +4,9 @@
  * Decorate function for the identity-step block.
  * All DOM queries are scoped to the block to avoid global collisions.
  */
+import { trackIdentityStep, trackCardSelected, trackIdentitySubmit } from '../../scripts/aem.js';
+
 export default function decorate(block) {
-  // initialize standard Adobe-friendly data layer
-  window.digitalData = window.digitalData || { events: [], journey: {} };
-
-  /**
-   * Helper to push events to the global data layer and send via Alloy/Web SDK when available
-   * @param {Object} evt The event object to push
-   * @param {Object} [xdm] Optional XDM payload for Alloy
-   */
-  function pushDataEvent(evt, xdm) {
-    try {
-      window.digitalData = window.digitalData || { events: [] };
-      window.digitalData.events.push(evt);
-      // small console trace for debugging in dev
-      // eslint-disable-next-line no-console
-      console.log('AA Event Pushed:', evt);
-
-      if (xdm && window.alloy) {
-        try {
-          window.alloy('sendEvent', { xdm });
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.warn('Alloy sendEvent failed', err);
-        }
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('digitalData push failed', err);
-    }
-  }
   const wrapper = document.createElement('div');
   wrapper.className = 'identity-block identity-block--root';
 
@@ -137,24 +110,14 @@ export default function decorate(block) {
 
   const stepNames = ['Choose Card', 'Confirm Details', 'Employment', 'Submit'];
 
-  function trackStepEvent(stepName) {
-    const evt = {
-      event: 'identity_step',
-      stepName,
-      stepTimestamp: new Date().toISOString(),
-    };
-    pushDataEvent(evt, {
-      eventType: 'identity.step',
-      identityFlow: { stepName },
-    });
-  }
+  // use shared analytics helper to track steps
 
   function showStep(step) {
     panels.forEach((p, i) => p.classList.toggle('identity-block__panel--active', i === step));
     tabs.forEach((t, i) => t.classList.toggle('identity-block__tab--active', i === step));
     currentStep = step;
-    // push tracking event for this step
-    trackStepEvent(stepNames[step] || `step_${step}`);
+  // push tracking event for this step (shared helper)
+  trackIdentityStep(step, stepNames[step] || `step_${step}`);
 
     if (step === 3) fillReview();
   }
@@ -180,15 +143,8 @@ export default function decorate(block) {
       card.classList.add('identity-block__card--selected');
       selectedCard = card.dataset.card || '';
 
-      // push card selection event
-      pushDataEvent({
-        event: 'card_selected',
-        cardName: selectedCard,
-        timestamp: new Date().toISOString(),
-      }, {
-        eventType: 'card.selected',
-        selectedCard: { name: selectedCard },
-      });
+      // push card selection event (shared helper)
+      trackCardSelected(selectedCard);
     });
   });
 
@@ -213,12 +169,11 @@ export default function decorate(block) {
     submitBtn.addEventListener('click', (e) => {
       // gather a small payload for submission
       const payload = {
-        event: 'identity_submit',
         selectedCard: selectedCard || null,
         name: root.querySelector('#fullName')?.value || null,
-        timestamp: new Date().toISOString(),
       };
-      pushDataEvent(payload, { eventType: 'identity.submit', selectedCard: { name: selectedCard } });
+      // use shared helper to track submit; payload should be sanitized for PII
+      trackIdentitySubmit(payload);
       // allow normal form behavior (no preventDefault)
     });
   }
