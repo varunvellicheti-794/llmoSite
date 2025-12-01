@@ -742,6 +742,5 @@ export {
   toCamelCase,
   toClassName,
   waitForFirstImage,
-  wrapTextNodes,
-  pushDigitalEvent,
+  wrapTextNodes
 };
