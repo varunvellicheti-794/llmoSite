@@ -157,6 +157,28 @@ function setup() {
     console.warn('digitalData initialization failed', e);
   }
 
+  // Initialize global app data layer and event dispatcher for Adobe Launch integration.
+  // This enables Launch rules to listen to custom events and fire Analytics beacons.
+  try {
+    window.appDataLayer = window.appDataLayer || [];
+    window.pushEvent = function(eventName, data = {}) {
+      const eventObj = {
+        event: eventName,
+        time: new Date().toISOString(),
+        ...data,
+      };
+      window.appDataLayer.push(eventObj);
+      // Dispatch custom event so Launch rules can listen and fire
+      document.dispatchEvent(new CustomEvent('app-event', { detail: eventObj }));
+      // eslint-disable-next-line no-console
+      console.debug('pushEvent:', eventObj);
+    };
+  } catch (e) {
+    // defensive fallback if event dispatch throws (rare)
+    // eslint-disable-next-line no-console
+    console.warn('appDataLayer setup failed', e);
+  }
+
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {

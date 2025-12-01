@@ -116,8 +116,20 @@ export default function decorate(block) {
     panels.forEach((p, i) => p.classList.toggle('identity-block__panel--active', i === step));
     tabs.forEach((t, i) => t.classList.toggle('identity-block__tab--active', i === step));
     currentStep = step;
-  // push tracking event for this step (shared helper)
-  trackIdentityStep(step, stepNames[step] || `step_${step}`);
+    // push tracking event for this step (shared helper)
+    trackIdentityStep(step, stepNames[step] || `step_${step}`);
+
+    // Also fire a data-layer event for Adobe Launch rules to intercept
+    const eventMap = {
+      0: 'choose_card',
+      1: 'confirm_details',
+      2: 'employment_step',
+      3: 'submit_application',
+    };
+    const eventName = eventMap[step] || `step_${step}`;
+    if (window.pushEvent) {
+      window.pushEvent(eventName, { stepIndex: step, stepName: stepNames[step] });
+    }
 
     if (step === 3) fillReview();
   }
@@ -145,6 +157,11 @@ export default function decorate(block) {
 
       // push card selection event (shared helper)
       trackCardSelected(selectedCard);
+
+      // Fire data-layer event for Adobe Launch rules
+      if (window.pushEvent) {
+        window.pushEvent('choose_card', { cardName: selectedCard });
+      }
     });
   });
 
@@ -174,6 +191,14 @@ export default function decorate(block) {
       };
       // use shared helper to track submit; payload should be sanitized for PII
       trackIdentitySubmit(payload);
+
+      // Fire data-layer event for Adobe Launch rules
+      if (window.pushEvent) {
+        window.pushEvent('application_submit', {
+          selectedCard: selectedCard || null,
+          formCompleted: true,
+        });
+      }
       // allow normal form behavior (no preventDefault)
     });
   }
