@@ -160,11 +160,49 @@ function setup() {
   // Initialize global app data layer (comprehensive structure) for multi-touch attribution.
   // Supports visitor tracking, form state, event logging, and journey analytics.
   try {
+    // Persist a stable visitorId across browser sessions (localStorage)
+    const storedVisitorId = (() => {
+      try {
+        return localStorage.getItem('visitorId');
+      } catch (e) {
+        return null;
+      }
+    })();
+    const visitorId = storedVisitorId || `visitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    try {
+      if (!storedVisitorId) localStorage.setItem('visitorId', visitorId);
+    } catch (e) {
+      // ignore localStorage write failures
+    }
+
+    // sessionId should be per-tab/session (use sessionStorage)
+    const storedSessionId = (() => {
+      try {
+        return sessionStorage.getItem('sessionId');
+      } catch (e) {
+        return null;
+      }
+    })();
+    const sessionId = storedSessionId || `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    try {
+      if (!storedSessionId) sessionStorage.setItem('sessionId', sessionId);
+    } catch (e) {
+      // ignore
+    }
+
+    // Ensure we have a journeyId to uniquely identify this journey across hits (persist until conversion)
+    let journeyId = null;
+    try {
+      journeyId = localStorage.getItem('journeyId');
+    } catch (e) {
+      journeyId = null;
+    }
+
     window.appDataLayer = window.appDataLayer || {
       // Visitor context (set once per session)
       visitor: {
-        visitorId: `visitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        sessionId: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        visitorId: visitorId,
+        sessionId: sessionId,
         sessionStartTime: new Date().toISOString(),
         userSegment: 'NEW', // 'NEW' | 'EXISTING'
         campaignId: null, // set from URL params if applicable
@@ -180,8 +218,8 @@ function setup() {
         company: null,
       },
 
-      // Events array (chronological log of all events)
-      events: [],
+  // Events array (chronological log of all events)
+  events: [],
 
       // Journey tracking (multi-step funnel context)
       journey: {
@@ -194,6 +232,8 @@ function setup() {
           lastActiveTime: null,
         },
       },
+      // Journey identifier for attribution (persist until conversion)
+      journeyId: journeyId || null,
     };
   } catch (e) {
     // defensive: in very constrained CSP environments this could throw
@@ -265,6 +305,23 @@ function setup() {
         data.campaignId ||
         'unknown';
 
+      // Ensure there is a journeyId for this journey
+      let currentJourneyId = localStorage.getItem('journeyId');
+      if (!currentJourneyId) {
+        currentJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        try {
+          localStorage.setItem('journeyId', currentJourneyId);
+        } catch (e) {
+          // ignore write errors
+        }
+        // reflect on appDataLayer
+        try {
+          if (window.appDataLayer) window.appDataLayer.journeyId = currentJourneyId;
+        } catch (e) {
+          // ignore
+        }
+      }
+
       const newTouchpoint = `${eventName}|${touchpointValue}|${timestamp}`;
       const updatedList = existingList
         ? `${existingList}~${newTouchpoint}`
@@ -276,7 +333,28 @@ function setup() {
       console.debug('[Journey List] Updated:', {
         touchpoint: newTouchpoint,
         totalTouchpoints: updatedList.split('~').length,
+        journeyId: currentJourneyId,
       });
+
+      // If this event is a conversion, append conversion touchpoint and clear journey storage
+      if (eventName === 'application_submit') {
+        try {
+          // mark final list (already contains conversion touchpoint since we appended newTouchpoint)
+          const finalList = updatedList;
+          // optional: store finalList as finalJourneyList for debugging
+          localStorage.setItem('finalJourneyList', finalList);
+        } catch (e) {
+          // ignore
+        }
+        // Clear journeyList and journeyId so new journeys start fresh
+        try {
+          localStorage.removeItem('journeyList');
+          localStorage.removeItem('journeyId');
+          if (window.appDataLayer) window.appDataLayer.journeyId = null;
+        } catch (e) {
+          // ignore
+        }
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn('journeyList update failed (CSP or localStorage unavailable):', err);
@@ -284,6 +362,14 @@ function setup() {
 
     // Dispatch custom DOM event so Launch rules can listen and fire
     try {
+      // attach persistent identifiers to the event detail
+      try {
+        eventObj.visitorId = window.appDataLayer?.visitor?.visitorId || (localStorage ? localStorage.getItem('visitorId') : null);
+        eventObj.journeyId = window.appDataLayer?.journeyId || (localStorage ? localStorage.getItem('journeyId') : null);
+      } catch (e) {
+        // ignore
+      }
+
       document.dispatchEvent(new CustomEvent('app-event', { detail: eventObj }));
     } catch (err) {
       // defensive fallback if event dispatch throws (rare)
@@ -404,6 +490,59 @@ function trackIdentitySubmit(payload = {}) {
     eventTimestamp: safe.timestamp,
   };
   pushDigitalEvent(safe, xdm);
+}
+
+/**
+ * Journey / list helpers
+ */
+function getJourneyList() {
+  try {
+    return localStorage.getItem('journeyList') || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function addTouchpointToJourney(touchpointName, touchpointValue) {
+  try {
+    const ts = new Date().toISOString();
+    const tp = `${touchpointName}|${touchpointValue}|${ts}`;
+    const existing = localStorage.getItem('journeyList') || '';
+    const updated = existing ? `${existing}~${tp}` : tp;
+    localStorage.setItem('journeyList', updated);
+    // ensure journeyId exists
+    if (!localStorage.getItem('journeyId')) {
+      localStorage.setItem('journeyId', `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+    }
+    return updated;
+  } catch (e) {
+    return '';
+  }
+}
+
+function clearJourney() {
+  try {
+    localStorage.removeItem('journeyList');
+    localStorage.removeItem('journeyId');
+  } catch (e) {
+    // ignore
+  }
+}
+
+function getJourneyId() {
+  try {
+    return localStorage.getItem('journeyId') || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getVisitorId() {
+  try {
+    return localStorage.getItem('visitorId') || null;
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
