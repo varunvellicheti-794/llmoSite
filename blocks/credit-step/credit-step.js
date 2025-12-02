@@ -177,8 +177,41 @@ export default function decorate(block) {
     });
   });
 
+  // Detect initial step from URL query param or hash
+  // Supports: ?step=confirm_details or ?step=1 or #confirm_details or #1
+  function getInitialStep() {
+    const stepMap = {
+      'choose_card': 0,
+      '0': 0,
+      'confirm_details': 1,
+      '1': 1,
+      'employment_step': 2,
+      '2': 2,
+      'submit_application': 3,
+      '3': 3,
+    };
+
+    // Try query param first
+    const params = new URLSearchParams(window.location.search);
+    const stepParam = params.get('step');
+    if (stepParam && stepParam in stepMap) {
+      return stepMap[stepParam];
+    }
+
+    // Try hash (without # prefix)
+    const hash = window.location.hash.substring(1);
+    if (hash && hash in stepMap) {
+      return stepMap[hash];
+    }
+
+    // Default to step 0
+    return 0;
+  }
+
+  const initialStep = getInitialStep();
+
   // initial state
-  showStep(0);
+  showStep(initialStep);
 
   // Submit button tracking (scoped)
   const submitBtn = root.querySelector('button.identity-block__btn.identity-block__btn--primary:not(.js-next)');
