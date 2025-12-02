@@ -157,27 +157,143 @@ function setup() {
     console.warn('digitalData initialization failed', e);
   }
 
-  // Initialize global app data layer and event dispatcher for Adobe Launch integration.
-  // This enables Launch rules to listen to custom events and fire Analytics beacons.
+  // Initialize global app data layer (comprehensive structure) for multi-touch attribution.
+  // Supports visitor tracking, form state, event logging, and journey analytics.
   try {
-    window.appDataLayer = window.appDataLayer || [];
-    window.pushEvent = function(eventName, data = {}) {
-      const eventObj = {
-        event: eventName,
-        time: new Date().toISOString(),
-        ...data,
-      };
-      window.appDataLayer.push(eventObj);
-      // Dispatch custom event so Launch rules can listen and fire
-      document.dispatchEvent(new CustomEvent('app-event', { detail: eventObj }));
-      // eslint-disable-next-line no-console
-      console.debug('pushEvent:', eventObj);
+    window.appDataLayer = window.appDataLayer || {
+      // Visitor context (set once per session)
+      visitor: {
+        visitorId: `visitor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        sessionId: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        sessionStartTime: new Date().toISOString(),
+        userSegment: 'NEW', // 'NEW' | 'EXISTING'
+        campaignId: null, // set from URL params if applicable
+      },
+
+      // Current form state (updated as user progresses)
+      form: {
+        selectedCard: null, // MoneyBack, PixelPlay, Swiggy
+        fullName: null,
+        address: null,
+        pincode: null,
+        employmentType: null,
+        company: null,
+      },
+
+      // Events array (chronological log of all events)
+      events: [],
+
+      // Journey tracking (multi-step funnel context)
+      journey: {
+        entryPoint: 'choose_card', // 'choose_card' | 'confirm_details' | etc.
+        currentStep: 0,
+        stepHistory: [], // array of steps visited in order
+        abandonment: {
+          reason: null, // 'incomplete', 'timeout', 'manual_exit'
+          lastActiveStep: null,
+          lastActiveTime: null,
+        },
+      },
     };
   } catch (e) {
-    // defensive fallback if event dispatch throws (rare)
+    // defensive: in very constrained CSP environments this could throw
     // eslint-disable-next-line no-console
-    console.warn('appDataLayer setup failed', e);
+    console.warn('appDataLayer initialization failed', e);
   }
+
+  // Initialize journey list for Adobe Analytics list variable (eVar50) persistence.
+  // Stores touchpoints in browser localStorage for cross-session attribution.
+  try {
+    // Journey list persists across sessions until cleared after conversion
+    // Format: "eventName|value|timestamp~eventName|value|timestamp~..."
+    if (!localStorage.getItem('journeyList')) {
+      localStorage.setItem('journeyList', '');
+    }
+  } catch (e) {
+    // defensive: localStorage may be unavailable (CSP, private browsing, etc.)
+    // eslint-disable-next-line no-console
+    console.warn('journeyList initialization failed', e);
+  }
+
+  // Initialize global event dispatcher for Adobe Launch integration with list variable support.
+  // Enables Launch rules to listen to custom DOM events and append to persistent list.
+  window.pushEvent = function(eventName, data = {}) {
+    const eventObj = {
+      // Auto-generated metadata
+      eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      eventName,
+      eventType: data.eventType || 'step',
+      eventTimestamp: new Date().toISOString(),
+      eventSequence: (window.appDataLayer?.events?.length || 0) + 1,
+
+      // User context
+      userId: window.appDataLayer?.visitor?.userId || null,
+      sessionId: window.appDataLayer?.visitor?.sessionId || null,
+      visitorId: window.appDataLayer?.visitor?.visitorId || null,
+
+      // Business context
+      productDetails: {
+        selectedCard: window.appDataLayer?.form?.selectedCard || null,
+        cardCategory: window.appDataLayer?.form?.selectedCard
+          ? (() => {
+            const categoryMap = {
+              MoneyBack: 'rewards',
+              PixelPlay: 'digital',
+              Swiggy: 'cashback',
+            };
+            return categoryMap[window.appDataLayer.form.selectedCard] || 'standard';
+          })()
+          : null,
+      },
+
+      // Merge custom data provided by caller
+      ...data,
+    };
+
+    // Push to data layer array
+    if (window.appDataLayer && Array.isArray(window.appDataLayer.events)) {
+      window.appDataLayer.events.push(eventObj);
+    }
+
+    // LIST VARIABLE SUPPORT: Append touchpoint to localStorage journey list for eVar50
+    try {
+      const existingList = localStorage.getItem('journeyList') || '';
+      const timestamp = new Date().toISOString();
+      const touchpointValue = 
+        data.productDetails?.selectedCard ||
+        data.step?.stepName ||
+        data.campaignId ||
+        'unknown';
+
+      const newTouchpoint = `${eventName}|${touchpointValue}|${timestamp}`;
+      const updatedList = existingList
+        ? `${existingList}~${newTouchpoint}`
+        : newTouchpoint;
+
+      localStorage.setItem('journeyList', updatedList);
+
+      // eslint-disable-next-line no-console
+      console.debug('[Journey List] Updated:', {
+        touchpoint: newTouchpoint,
+        totalTouchpoints: updatedList.split('~').length,
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('journeyList update failed (CSP or localStorage unavailable):', err);
+    }
+
+    // Dispatch custom DOM event so Launch rules can listen and fire
+    try {
+      document.dispatchEvent(new CustomEvent('app-event', { detail: eventObj }));
+    } catch (err) {
+      // defensive fallback if event dispatch throws (rare)
+      // eslint-disable-next-line no-console
+      console.warn('Custom event dispatch failed:', err);
+    }
+
+    // eslint-disable-next-line no-console
+    console.debug('pushEvent:', eventObj);
+  };
 
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
