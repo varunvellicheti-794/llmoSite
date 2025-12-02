@@ -194,6 +194,10 @@ function setup() {
     let journeyId = null;
     try {
       journeyId = localStorage.getItem('journeyId');
+      if (!journeyId) {
+        journeyId = `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('journeyId', journeyId);
+      }
     } catch (e) {
       journeyId = null;
     }
@@ -218,8 +222,8 @@ function setup() {
         company: null,
       },
 
-  // Events array (chronological log of all events)
-  events: [],
+      // Events array (chronological log of all events)
+      events: [],
 
       // Journey tracking (multi-step funnel context)
       journey: {
@@ -233,7 +237,7 @@ function setup() {
         },
       },
       // Journey identifier for attribution (persist until conversion)
-      journeyId: journeyId || null,
+      journeyId: journeyId,
     };
   } catch (e) {
     // defensive: in very constrained CSP environments this could throw
