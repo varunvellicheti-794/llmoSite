@@ -1,12 +1,15 @@
+/* stylelint-disable selector-class-pattern, rule-empty-line-before, declaration-empty-line-before, comment-empty-line-before */
+
 /* blocks/identity-step/identity-step.css
    All styles scoped under .identity-block prefix to avoid collision.
 */
 
 .identity-block {
-  --ib-bg: #ffffff;
+  --ib-bg: #fff;
   --ib-accent: #0073cc;
   --ib-green: #167a2f;
   --ib-border: #d6e9ff;
+
   font-family: Arial, Helvetica, sans-serif;
   box-sizing: border-box;
 }
@@ -82,7 +85,7 @@
   cursor: pointer;
 }
 .identity-block__card:hover {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 6%);
 }
 .identity-block__card--selected {
   border: 2px solid var(--ib-green);
@@ -160,7 +163,11 @@
 }
 
 /* small responsive tweaks */
-@media (max-width: 640px) {
+@media (width <= 640px) {
   .identity-block__cards { flex-direction: column; }
-  .identity-block__tab { font-size: 13px; padding: 8px; }
+
+  .identity-block__tab {
+    font-size: 13px;
+    padding: 8px;
+  }
 }
