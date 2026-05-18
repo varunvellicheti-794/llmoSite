@@ -1,0 +1,39 @@
+{
+  "variantName": "columns-product",
+  "baseBlock": "columns",
+  "version": "1.0.0",
+  "created": "2026-05-18T12:46:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html",
+    "originPage": "Wegovy product detail page",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "spacious",
+    "purpose": "product-detail",
+    "imagePattern": "large"
+  },
+  "contentPattern": {
+    "structure": "image gallery + product configuration form",
+    "buttonCount": 1,
+    "imageCount": 3
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "product detail pages",
+      "medication enrollment pages",
+      "product configuration layouts"
+    ],
+    "notSuitableFor": [
+      "simple text comparison layouts",
+      "image-only galleries",
+      "blog content layouts"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/content/novocare-poc/home/weight-loss/wegovy"],
+    "reuseCount": 1,
+    "lastUsed": "2026-05-18T12:46:00.000Z"
+  }
+}

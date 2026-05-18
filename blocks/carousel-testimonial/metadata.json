@@ -1,0 +1,39 @@
+{
+  "variantName": "carousel-testimonial",
+  "baseBlock": "carousel",
+  "version": "1.0.0",
+  "created": "2026-05-18T12:46:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html",
+    "originPage": "Wegovy product detail page",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "spacious",
+    "purpose": "testimonial",
+    "imagePattern": "icon"
+  },
+  "contentPattern": {
+    "structure": "avatar image + quote text + author name + meta",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "patient testimonial sections",
+      "customer review carousels",
+      "quote showcases with author attribution"
+    ],
+    "notSuitableFor": [
+      "image-only galleries",
+      "product feature carousels",
+      "hero banners with rotating content"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/content/novocare-poc/home/weight-loss/wegovy"],
+    "reuseCount": 1,
+    "lastUsed": "2026-05-18T12:46:00.000Z"
+  }
+}

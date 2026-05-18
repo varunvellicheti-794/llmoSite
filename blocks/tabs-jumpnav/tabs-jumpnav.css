@@ -1,0 +1,59 @@
+.tabs-jumpnav {
+  background-color: #fff;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 24px 0;
+}
+
+.tabs-jumpnav .tabs-jumpnav-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.tabs-jumpnav .tabs-jumpnav-list button {
+  flex: 0 0 max-content;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  padding: 8px 16px;
+  background-color: transparent;
+  color: #525252;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: unset;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.tabs-jumpnav .tabs-jumpnav-list button:hover {
+  color: #171717;
+  background-color: transparent;
+}
+
+.tabs-jumpnav .tabs-jumpnav-list button[aria-selected='true'] {
+  color: #171717;
+  font-weight: 600;
+  border-bottom: 2px solid #171717;
+  background-color: transparent;
+}
+
+.tabs-jumpnav .tabs-jumpnav-list button p {
+  margin: 0;
+}
+
+.tabs-jumpnav .tabs-jumpnav-panel {
+  display: none;
+}
+
+.tabs-jumpnav .tabs-jumpnav-panel[aria-hidden='false'] {
+  display: block;
+}

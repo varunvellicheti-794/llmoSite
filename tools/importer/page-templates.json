@@ -1,0 +1,128 @@
+{
+  "metadata": {
+    "projectType": "da"
+  },
+  "templates": [
+    {
+      "name": "weight-loss-product",
+      "urls": [
+        "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html"
+      ],
+      "description": "Weight loss product page with medication information and resources",
+      "blocks": [
+        {
+          "name": "columns-product",
+          "instances": [
+            "section.medication-enrollment-card",
+            ".product-information__columns",
+            ".cmp-howtogetmedication"
+          ]
+        },
+        {
+          "name": "tabs-jumpnav",
+          "instances": [
+            ".cmp-tabs.cmp-tabs--jump-nav"
+          ]
+        },
+        {
+          "name": "carousel-testimonial",
+          "instances": [
+            ".cmp-testimonial-carousel"
+          ]
+        },
+        {
+          "name": "accordion-faq",
+          "instances": [
+            ".cmp-faq"
+          ]
+        },
+        {
+          "name": "form",
+          "instances": [
+            ".phx-newsletter-form"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Product Hero",
+          "selector": "section.medication-enrollment-card",
+          "style": null,
+          "blocks": [
+            "columns-product"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Jump Navigation",
+          "selector": ".cmp-tabs.cmp-tabs--jump-nav",
+          "style": null,
+          "blocks": [
+            "tabs-jumpnav"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-3",
+          "name": "Product Information",
+          "selector": "section.product-information",
+          "style": null,
+          "blocks": [
+            "columns-product"
+          ],
+          "defaultContent": [
+            ".product-information__title",
+            ".product-information__intro",
+            ".product-information__side-effects",
+            ".product-information__disclaimer"
+          ]
+        },
+        {
+          "id": "section-4",
+          "name": "How to Get Medication",
+          "selector": ".cmp-howtogetmedication",
+          "style": null,
+          "blocks": [
+            "columns-product"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-5",
+          "name": "Patient Testimonials",
+          "selector": ".cmp-testimonial-carousel",
+          "style": "dark",
+          "blocks": [
+            "carousel-testimonial"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-6",
+          "name": "FAQ",
+          "selector": ".cmp-faq",
+          "style": null,
+          "blocks": [
+            "accordion-faq"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-7",
+          "name": "Newsletter Signup",
+          "selector": "section.phx-newsletter-form",
+          "style": null,
+          "blocks": [
+            "form"
+          ],
+          "defaultContent": [
+            ".phx-newsletter-form__heading",
+            ".phx-newsletter-form__subtext"
+          ]
+        }
+      ]
+    }
+  ]
+}

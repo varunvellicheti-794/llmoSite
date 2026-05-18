@@ -1,0 +1,39 @@
+{
+  "variantName": "tabs-jumpnav",
+  "baseBlock": "tabs",
+  "version": "1.0.0",
+  "created": "2026-05-18T12:46:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html",
+    "originPage": "Wegovy product detail page",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "minimal",
+    "purpose": "navigation",
+    "imagePattern": "noimg"
+  },
+  "contentPattern": {
+    "structure": "jump-to navigation labels + content panels",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "product detail pages with multiple sections",
+      "long-form content pages needing in-page navigation",
+      "documentation pages with section jumping"
+    ],
+    "notSuitableFor": [
+      "short single-section pages",
+      "pages with few content areas",
+      "tab interfaces with heavy interactive content"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/content/novocare-poc/home/weight-loss/wegovy"],
+    "reuseCount": 1,
+    "lastUsed": "2026-05-18T12:46:00.000Z"
+  }
+}

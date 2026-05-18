@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "url": "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html",
+  "path": "content/novocare-poc/home/weight-loss/wegovy",
+  "timestamp": "2026-05-18T13:17:13.336Z",
+  "title": "Wegovy",
+  "template": "weight-loss-product",
+  "blocks": [
+    "columns-product",
+    "columns-product",
+    "columns-product",
+    "tabs-jumpnav",
+    "carousel-testimonial",
+    "accordion-faq",
+    "form"
+  ]
+}

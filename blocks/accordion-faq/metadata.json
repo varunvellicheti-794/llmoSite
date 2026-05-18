@@ -1,0 +1,39 @@
+{
+  "variantName": "accordion-faq",
+  "baseBlock": "accordion",
+  "version": "1.0.0",
+  "created": "2026-05-18T12:46:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://publish-p99508-e1532789.adobeaemcloud.com/content/novocare-poc/home/weight-loss/wegovy.html",
+    "originPage": "Wegovy product detail page",
+    "blockPosition": "bottom"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "minimal",
+    "purpose": "faq",
+    "imagePattern": "noimg"
+  },
+  "contentPattern": {
+    "structure": "question heading + answer paragraph",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "reuseGuidance": {
+    "suitableFor": [
+      "FAQ sections on product pages",
+      "help and support pages",
+      "knowledge base articles with expandable answers"
+    ],
+    "notSuitableFor": [
+      "complex multi-media accordion content",
+      "nested accordion structures",
+      "accordion with heavy interactive elements inside panels"
+    ]
+  },
+  "usage": {
+    "pagesUsing": ["/content/novocare-poc/home/weight-loss/wegovy"],
+    "reuseCount": 1,
+    "lastUsed": "2026-05-18T12:46:00.000Z"
+  }
+}
