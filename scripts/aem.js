@@ -190,7 +190,8 @@ function setup() {
       // ignore
     }
 
-    // Ensure we have a journeyId to uniquely identify this journey across hits (persist until conversion)
+    // Ensure we have a journeyId to uniquely identify this journey
+    // across hits (persist until conversion)
     let journeyId = null;
     try {
       journeyId = localStorage.getItem('journeyId');
@@ -205,8 +206,8 @@ function setup() {
     window.appDataLayer = window.appDataLayer || {
       // Visitor context (set once per session)
       visitor: {
-        visitorId: visitorId,
-        sessionId: sessionId,
+        visitorId,
+        sessionId,
         sessionStartTime: new Date().toISOString(),
         userSegment: 'NEW', // 'NEW' | 'EXISTING'
         campaignId: null, // set from URL params if applicable
@@ -237,7 +238,7 @@ function setup() {
         },
       },
       // Journey identifier for attribution (persist until conversion)
-      journeyId: journeyId,
+      journeyId,
     };
   } catch (e) {
     // defensive: in very constrained CSP environments this could throw
@@ -261,7 +262,7 @@ function setup() {
 
   // Initialize global event dispatcher for Adobe Launch integration with list variable support.
   // Enables Launch rules to listen to custom DOM events and append to persistent list.
-  window.pushEvent = function(eventName, data = {}) {
+  window.pushEvent = function pushEvent(eventName, data = {}) {
     const eventObj = {
       // Auto-generated metadata
       eventId: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -303,11 +304,10 @@ function setup() {
     try {
       const existingList = localStorage.getItem('journeyList') || '';
       const timestamp = new Date().toISOString();
-      const touchpointValue = 
-        data.productDetails?.selectedCard ||
-        data.step?.stepName ||
-        data.campaignId ||
-        'unknown';
+      const touchpointValue = data.productDetails?.selectedCard
+        || data.step?.stepName
+        || data.campaignId
+        || 'unknown';
 
       // Ensure there is a journeyId for this journey
       let currentJourneyId = localStorage.getItem('journeyId');
@@ -343,7 +343,7 @@ function setup() {
       // If this event is a conversion, append conversion touchpoint and clear journey storage
       if (eventName === 'application_submit') {
         try {
-          // mark final list (already contains conversion touchpoint since we appended newTouchpoint)
+          // mark final list (already contains conversion touchpoint)
           const finalList = updatedList;
           // optional: store finalList as finalJourneyList for debugging
           localStorage.setItem('finalJourneyList', finalList);
@@ -401,19 +401,21 @@ function setup() {
  * Returns { reportSuite, datastreamId }
  */
 function getAnalyticsConfig() {
-  const reportSuite = getMetadata('analytics:report-suite')
+  const reportSuite = getMetadata('analytics:report-suite') // eslint-disable-line no-use-before-define
     || (window.hlx && window.hlx.analytics && window.hlx.analytics.reportSuite)
     || '';
-  const datastreamId = (window.hlx && window.hlx.analytics && window.hlx.analytics.datastreamId) || '';
+  const datastreamId = (window.hlx && window.hlx.analytics
+    && window.hlx.analytics.datastreamId) || '';
   return { reportSuite, datastreamId };
 }
 
 /**
- * Push an event to the global digitalData.events array and optionally send an Alloy/Web SDK XDM payload.
+ * Push an event to the global digitalData.events array and
+ * optionally send an Alloy/Web SDK XDM payload.
  * @param {Object} evt event object to push into digitalData.events
- * @param {Object} [xdm] optional XDM payload to send via window.alloy when available
+ * @param {Object} [xdm] optional XDM payload via window.alloy
  */
-function pushDigitalEvent(evt = {}, xdm) {
+function pushDigitalEvent(evt, xdm) { // eslint-disable-line default-param-last
   try {
     window.digitalData = window.digitalData || { events: [] };
     window.digitalData.events.push(evt);
@@ -478,7 +480,8 @@ function trackCardSelected(cardName, context = {}) {
 }
 
 /**
- * Track final submit of the identity journey. Payload must avoid PII — include only allowable fields.
+ * Track final submit of the identity journey.
+ * Payload must avoid PII — include only allowable fields.
  * @param {Object} payload sanitized payload (non-PII)
  */
 function trackIdentitySubmit(payload = {}) {

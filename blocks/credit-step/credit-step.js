@@ -131,7 +131,7 @@ export default function decorate(block) {
       window.pushEvent(eventName, { stepIndex: step, stepName: stepNames[step] });
     }
 
-    if (step === 3) fillReview();
+    if (step === 3) fillReview(); // eslint-disable-line no-use-before-define
   }
 
   function fillReview() {
@@ -181,14 +181,14 @@ export default function decorate(block) {
   // Supports: ?step=confirm_details or ?step=1 or #confirm_details or #1
   function getInitialStep() {
     const stepMap = {
-      'choose_card': 0,
-      '0': 0,
-      'confirm_details': 1,
-      '1': 1,
-      'employment_step': 2,
-      '2': 2,
-      'submit_application': 3,
-      '3': 3,
+      choose_card: 0,
+      0: 0,
+      confirm_details: 1,
+      1: 1,
+      employment_step: 2,
+      2: 2,
+      submit_application: 3,
+      3: 3,
     };
 
     // Try query param first
@@ -216,7 +216,7 @@ export default function decorate(block) {
   // Submit button tracking (scoped)
   const submitBtn = root.querySelector('button.identity-block__btn.identity-block__btn--primary:not(.js-next)');
   if (submitBtn) {
-    submitBtn.addEventListener('click', (e) => {
+    submitBtn.addEventListener('click', () => {
       // gather a small payload for submission
       const payload = {
         selectedCard: selectedCard || null,
